@@ -77,28 +77,40 @@ public:
 		return map_attributes;
 	}
 
-	bool exists(std::string name)
+	std::string operator[] (std::string name) {
+		TMapAttributes::iterator it;
+		return (exists(name, it)) ? it->second : std::string();
+	}
+
+	bool exists(std::string attr_name, TMapAttributes::iterator& iterator)
 	{
-		return !this->getAttribute(name).isNull();
+		iterator = map_attributes.find(attr_name);
+		return (iterator != map_attributes.end());
+	}
+
+	bool exists(std::string attr_name) {
+		TMapAttributes::iterator it;
+		return exists(attr_name, it);
+	}
+
+	TMapAttributes::size_type count() {
+		return map_attributes.size();
 	}
 
 	bool addAttribute(TAttribute attribute)
 	{
 		// Check that attribute is not null and that there is not another attribute with the same name
 		// ToDo: gestione errori
-		if (!attribute.isNull() && !this->exists(attribute.getName()))
-		{
-			map_attributes.insert(attribute.get_pair());
-			return true;
-		}
-		else {
-			return false;
-		}
+		return addAttribute(attribute.getName(), attribute.getValue());
 	}
 
 	bool addAttribute(std::string name, std::string value) {
-		TAttribute attribute(name, value);
-		return addAttribute(attribute);
+		if (name.empty() || exists(name)) {
+			return false;
+		} else {
+			map_attributes.insert(std::pair<std::string,std::string>(name, value));
+			return true;
+		}
 	}
 
 	bool removeAttribute(std::string name)
@@ -113,14 +125,12 @@ public:
 		}
 	}
 
-	TAttribute getAttribute(std::string name)
+	std::string getAttribute(std::string name)
 	{
 		TMapAttributes::iterator iterator = this->map_attributes.find(name);
-		TAttribute result = (iterator != map_attributes.end()) ?
-				TAttribute(iterator->first, iterator->second) :
-				TAttribute();
-
-		return result;
+		return (iterator != map_attributes.end()) ?
+				iterator->second :
+				std::string();
 	}
 
 
