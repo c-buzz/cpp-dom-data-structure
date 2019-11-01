@@ -57,7 +57,7 @@ void UTElement() {
 		std::cout << "OK - hasAttributes() return false" << std::endl;
 	}
 
-	TAttribute attr;
+	/*TAttribute attr;
 
 	element.addAttribute(TAttribute("ATTR1", "VALATTR1"));
 	cout << "- Added attribute (ATTR1,VALATTR1)" << endl;
@@ -75,7 +75,7 @@ void UTElement() {
 	cout << "- Added attribute (ATTR3,VALATTR3)" << endl;
 
 	attr = element.getAttribute("ATTR3");
-	cout << "- getAttribute('ATTR3') returns value " << attr.getValue() << endl;
+	cout << "- getAttribute('ATTR3') returns value " << attr.getValue() << endl;*/
 
 }
 

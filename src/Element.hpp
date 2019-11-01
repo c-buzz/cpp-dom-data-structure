@@ -13,8 +13,77 @@
 #include <vector>
 #include <functional>
 
-#include "Attribute.hpp"
+
 #include "boost/any.hpp"
+
+typedef std::map<std::string, std::string> TMapAttributes;
+
+class TAttributes
+{
+private:
+	TMapAttributes map_attributes;
+
+public:
+
+	TAttributes() {};
+	virtual ~TAttributes() {};
+
+	TMapAttributes getMapAttributes()
+	{
+		return map_attributes;
+	}
+
+	std::string operator[] (std::string name) {
+		TMapAttributes::iterator it;
+		return (exists(name, it)) ? it->second : std::string();
+	}
+
+	bool exists(std::string attr_name, TMapAttributes::iterator& iterator)
+	{
+		iterator = map_attributes.find(attr_name);
+		return (iterator != map_attributes.end());
+	}
+
+	bool exists(std::string attr_name) {
+		TMapAttributes::iterator it;
+		return exists(attr_name, it);
+	}
+
+	TMapAttributes::size_type count() {
+		return map_attributes.size();
+	}
+
+	bool addAttribute(std::string name, std::string value) {
+		if (name.empty() || exists(name)) {
+			return false;
+		} else {
+			map_attributes.insert(std::pair<std::string,std::string>(name, value));
+			return true;
+		}
+	}
+
+	bool removeAttribute(std::string name)
+	{
+		TMapAttributes::iterator iterator = this->map_attributes.find(name);
+		if (iterator != this->map_attributes.end()) {
+			this->map_attributes.erase(iterator);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	std::string getAttribute(std::string name)
+	{
+		TMapAttributes::iterator iterator = this->map_attributes.find(name);
+		return (iterator != map_attributes.end()) ?
+				iterator->second :
+				std::string();
+	}
+
+
+};
 
 class Element: public TAttributes {
 private:

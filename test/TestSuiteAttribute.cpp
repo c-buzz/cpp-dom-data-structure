@@ -1,5 +1,8 @@
+
+#define BOOST_ALL_DYN_LINK
+#include "boost/config/user.hpp"
+#include <boost/format.hpp>
 #include <Element.hpp>
-#include <Attribute.hpp>
 #include <cstdio>
 #include <iostream>
 
@@ -34,23 +37,13 @@ BOOST_AUTO_TEST_CASE(ADD_ATTRIBUTE)
 	BOOST_TEST(a["ATTR_NAME"] == "ATTR_VAL");
 	BOOST_TEST(a["ATTR"] == std::string());
 
-
-
 	BOOST_TEST(a.exists("ATTR_NAME"));
-
 	BOOST_TEST(a.addAttribute("", "OKVAL_NONAME") == false);
-
 	BOOST_TEST(a.addAttribute("OKNAME_NOVAL", ""));
-
 	BOOST_TEST(a["OKNAME_NOVAL"].compare("") == 0);
-
 	BOOST_TEST(a.addAttribute("ATTR_NAME", "NOVALID") == false);
-
 	BOOST_TEST(a.removeAttribute("ATTR_NAME"));
-
 	BOOST_TEST(a.exists("ATTR_NAME") == false);
-
-
 
 }
 
