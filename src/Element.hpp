@@ -12,11 +12,18 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <iostream>
 
 
 #include "boost/any.hpp"
 
+
+class TAttributes;
+class Element;
+
 typedef std::map<std::string, std::string> TMapAttributes;
+typedef std::vector<Element> TChildren;
+typedef std::vector<uint8_t> cdds_data_t;
 
 class TAttributes
 {
@@ -24,11 +31,10 @@ private:
 	TMapAttributes map_attributes;
 
 public:
-
 	TAttributes() {};
 	virtual ~TAttributes() {};
 
-	TMapAttributes getMapAttributes()
+	const TMapAttributes& getMapAttributes() const
 	{
 		return map_attributes;
 	}
@@ -54,12 +60,16 @@ public:
 	}
 
 	bool addAttribute(std::string name, std::string value) {
-		if (name.empty() || exists(name)) {
+		if (exists(name) || name.empty()) {
 			return false;
 		} else {
-			map_attributes.insert(std::pair<std::string,std::string>(name, value));
+			map_attributes[name] = value;
 			return true;
 		}
+	}
+
+	void attribute(std::string name, std::string value) {
+		map_attributes[name] = value;
 	}
 
 	bool removeAttribute(std::string name)
@@ -85,11 +95,11 @@ public:
 
 };
 
-class Element: public TAttributes {
+class Element: public virtual TAttributes {
 private:
 	std::string name;
 	boost::any value;
-	std::vector<Element> children;
+	TChildren children;
 
 	int element_id;
 	Element* parent;
@@ -98,13 +108,22 @@ private:
 
 	static int element_id_counter;
 
+	void _init_ptr() {
+		root = nullptr;
+		parent = nullptr;
+	}
+
 public:
 	Element(std::string name, boost::any value) :
 			name(name), value(value), element_id(++element_id_counter)
 	{
-		//TODO: gestire name null
-		parent = nullptr;
-		root = nullptr;
+		_init_ptr();
+	}
+
+	Element(std::string name) :
+		name(name), element_id(++element_id_counter)
+	{
+		_init_ptr();
 	}
 
 	virtual ~Element() {};
@@ -117,7 +136,7 @@ public:
 		this->name = name;
 	}
 
-	const boost::any& getValue() {
+	const boost::any& getValue() const {
 		return this->value;
 	}
 
@@ -125,20 +144,42 @@ public:
 		this->value = value;
 	}
 
-	void addChild(Element child) {
+	Element* addChild(Element child) {
 		child.parent = this;
 		children.push_back(child);
+		return &children.back();
 	}
 
-	bool hasChild() {
+	const Element* addChild(std::string name, boost::any value = NULL) {
+		Element child(name, value);
+		return addChild(child);
+	}
+
+	bool hasChild() const {
 		return (children.size() > 0);
+	}
+
+	bool hasValue() const {
+		/*try {
+			std::string str = boost::any_cast<std::string>(value);
+			std::cout << str << std::endl;
+			return !str.empty();
+		}
+		catch (const boost::bad_any_cast& e) {
+			return !value.empty();
+		}*/
+		return !value.empty();
 	}
 
 	int childrenCount() {
 		return children.size();
 	}
 
-	Element* findChildByID(int _id, std::vector<Element>::iterator& it) {
+	const TChildren& getChildrenVector() const {
+		return this->children;
+	}
+
+	Element* findChildByID(int _id, TChildren::iterator& it) {
 		//std::vector<Element>::iterator it;
 		it = std::find_if(children.begin(), children.end(),
 				[_id](const Element e) {
@@ -228,6 +269,11 @@ public:
 
 	int getRootId() {
 		return getRoot()->getId();
+	}
+
+	const std::vector<Element>* childrenVector() {
+		const std::vector<Element>* vptr = &children;
+		return vptr;
 	}
 };
 

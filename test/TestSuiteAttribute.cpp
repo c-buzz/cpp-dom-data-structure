@@ -1,15 +1,18 @@
 
-#define BOOST_ALL_DYN_LINK
+//#define BOOST_ALL_DYN_LINK
 #include "boost/config/user.hpp"
 #include <boost/format.hpp>
-#include <Element.hpp>
+#include "../src/Element.hpp"
 #include <cstdio>
 #include <iostream>
 
+#include "../src/cdds_output.hpp"
+#include "../src/cdds_input.hpp"
+
 using namespace std;
 
-#define BOOST_TEST_MODULE TEST
-#include <boost/test/included/unit_test.hpp>
+/*#define BOOST_TEST_MODULE TEST
+#include <boost/test/included/unit_test.hpp>*/
 
 struct AttributeFixture {
 	AttributeFixture() {
@@ -23,7 +26,7 @@ struct AttributeFixture {
 	TAttributes* attributes;
 };
 
-BOOST_AUTO_TEST_SUITE(TS_ATTRIBUTE)
+/*BOOST_AUTO_TEST_SUITE(TS_ATTRIBUTE)
 
 
 BOOST_AUTO_TEST_CASE(ADD_ATTRIBUTE)
@@ -45,6 +48,58 @@ BOOST_AUTO_TEST_CASE(ADD_ATTRIBUTE)
 	BOOST_TEST(a.removeAttribute("ATTR_NAME"));
 	BOOST_TEST(a.exists("ATTR_NAME") == false);
 
+
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END() */
+
+cdds_data_t strtovec(std::string str) {
+	cdds_data_t out(str.begin(), str.end());
+	return out;
+}
+
+
+int main() {
+
+	Element root("profiles");
+
+	boost::any root_val = root.getValue();
+
+//	const std::type_info &ti = root_val.type();
+//	std::cout << "Root value empty: " << root_val.empty() << std::endl;
+//	std::cout << "Root value type: " << ti.name() << std::endl;
+
+	Element t59("profile");
+
+	t59.hasValue();
+
+	t59.addAttribute("name", "RFC6238 SHA1 T=59");
+
+		Element t59sec("secret",strtovec("1234567890"));
+		t59sec.addAttribute("type","plaint-text");
+
+	t59sec.hasValue();
+	cdds_data_t v = boost::any_cast<cdds_data_t>(t59sec.getValue());
+
+
+	t59.addChild(t59sec);
+	t59.addChild(Element("XO", "30"));
+
+	t59.addChild(Element("digits", strtovec("8")));
+	t59.addChild(Element("forcedT", strtovec("59")));
+	t59.addChild(Element("hash", strtovec("SHA1")));
+
+	root.addChild(t59);
+
+	/*cdds_output cdds(&root, "buzztotp_profiles.xml");
+
+	cdds.output();
+
+	cdds_data_t vec = cdds.get_byte_data();*/
+
+	cdds_input ci("filename.xml");
+
+	std::cout << "Fine delle trasmissioni";
+
+	return 0;
+}
