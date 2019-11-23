@@ -13,8 +13,8 @@
 #include <fstream>
 #include <base64_rfc4648.hpp>
 
+#include "cdds_codec.old.hpp"
 #include "Element.hpp"
-#include "cdds_codec.hpp"
 
 class cdds_output :
 		public virtual Element
@@ -49,7 +49,7 @@ private:
 				std::cout << e.what();
 			}
 		} else {
-			Element data_el("_cdds_data");
+			Element data_el(std::string("_cdds_data")); // @suppress("Ambiguous problem")
 			cdds_codec::encodeElementData(&data_el, element.getValue());
 			processNode(data_el);
 		}
@@ -121,6 +121,12 @@ private:
 public:
 	cdds_output(std::string nodeName, boost::any nodeValue):
 		Element(nodeName, nodeValue)
+	{
+
+	}
+
+	cdds_output(std::string nodeName):
+		Element(nodeName) // @suppress("Ambiguous problem")
 	{
 
 	}

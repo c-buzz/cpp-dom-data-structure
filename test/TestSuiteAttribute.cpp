@@ -61,7 +61,7 @@ cdds_data_t strtovec(std::string str) {
 
 int main() {
 
-	Element root("profiles");
+	cdds_output root("profiles");
 
 	boost::any root_val = root.getValue();
 
@@ -91,13 +91,11 @@ int main() {
 
 	root.addChild(t59);
 
-	/*cdds_output cdds(&root, "buzztotp_profiles.xml");
+	//cdds_output cdds(&root, "buzztotp_profiles.xml");
 
-	cdds.output();
+	root.outputXML("buzztotp_profiles.xml");
 
-	cdds_data_t vec = cdds.get_byte_data();*/
-
-	cdds_input ci("filename.xml");
+	//cdds_input ci("filename.xml");
 
 	std::cout << "Fine delle trasmissioni";
 
